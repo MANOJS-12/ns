@@ -155,4 +155,87 @@ class Main {
         s.close();
     }
 }
+----------------------------------------------------
+play fair
 
+import java.util.Scanner;
+
+class Main {
+    static char[][] table = new char[5][5];
+
+    static void createKey(String key) {
+        key = key.toUpperCase().replace("J", "I");
+        boolean[] used = new boolean[26];
+        int index = 0;
+        for (char c : (key + "ABCDEFGHIKLMNOPQRSTUVWXYZ").toCharArray()) {
+            if (!used[c - 'A']) {
+                table[index / 5][index % 5] = c;
+                used[c - 'A'] = true;
+                index++;
+            }
+        }
+    }
+
+    static String encrypt(String text) {
+        text = text.toUpperCase().replace("J", "I").replaceAll("[^A-Z]", "");
+        if (text.length() % 2 != 0) text += "X";
+        String result = "";
+        for (int i = 0; i < text.length(); i += 2) {
+            int[] a = find(text.charAt(i)), b = find(text.charAt(i + 1));
+            if (a[0] == b[0]) {
+                result += table[a[0]][(a[1] + 1) % 5];
+                result += table[b[0]][(b[1] + 1) % 5];
+            } else if (a[1] == b[1]) {
+                result += table[(a[0] + 1) % 5][a[1]];
+                result += table[(b[0] + 1) % 5][b[1]];
+            } else {
+                result += table[a[0]][b[1]];
+                result += table[b[0]][a[1]];
+            }
+        }
+        return result;
+    }
+
+    static int[] find(char c) {
+        for (int i = 0; i < 5; i++)
+            for (int j = 0; j < 5; j++)
+                if (table[i][j] == c) return new int[]{i, j};
+        return null;
+    }
+
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        
+        System.out.print("Enter Key: ");
+        String key = input.nextLine();
+        createKey(key);
+
+        System.out.print("Enter Plain Text: ");
+        String plainText = input.nextLine();
+
+        System.out.println("Encrypted Text: " + encrypt(plainText));
+    }
+}
+-------------------------------------------------------------------------------------------------------------
+rail fence
+
+import java.util.Scanner;
+class Main {
+    static String encrypt(String text, int rails) {
+        StringBuilder[] rail = new StringBuilder[rails];
+        for (int i = 0; i < rails; i++) rail[i] = new StringBuilder();
+        int i = 0, dir = 1;
+        for (char c : text.toCharArray()) {
+            rail[i].append(c);
+            if (i == 0) dir = 1; else if (i == rails - 1) dir = -1;
+            i += dir;
+        }
+        StringBuilder res = new StringBuilder();
+        for (StringBuilder sb : rail) res.append(sb);
+        return res.toString();
+    }
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println(encrypt(sc.nextLine(), sc.nextInt()));
+    }
+}
