@@ -1,0 +1,158 @@
+digital sign :
+
+import java.security.*;
+import java.util.Scanner;
+class SimpleDSSInput {
+    public static void main(String[] args) throws Exception {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter a message: ");
+        String message = scanner.nextLine(); 
+        scanner.close();
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA");
+        KeyPair keyPair = keyGen.generateKeyPair();
+        Signature sign = Signature.getInstance("SHA256withDSA");
+        sign.initSign(keyPair.getPrivate());
+        sign.update(message.getBytes());
+        byte[] signature = sign.sign();
+        sign.initVerify(keyPair.getPublic());
+        sign.update(message.getBytes());
+        System.out.println("Signature Verified: " + sign.verify(signature));
+    }
+}
+
+------------------------------------------------
+sha n md5 
+
+import java.security.*;
+import java.util.Scanner;
+
+class HashExample {
+    public static void main(String[] args) throws Exception {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter a message: ");
+        String message = sc.nextLine();
+        sc.close();
+
+        System.out.println("SHA-1: " + getHash(message, "SHA-1"));
+        System.out.println("MD5  : " + getHash(message, "MD5"));
+    }
+
+    public static String getHash(String msg, String algo) throws Exception {
+        MessageDigest md = MessageDigest.getInstance(algo);
+        byte[] digest = md.digest(msg.getBytes());
+
+        StringBuilder hex = new StringBuilder();
+        for (byte b : digest) hex.append(String.format("%02x", b));
+        return hex.toString();
+    }
+}
+
+-----------------------------------------------
+diffie-hellman 
+
+import java.math.BigInteger;
+import java.util.Scanner;
+
+class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter prime number (p): ");
+        BigInteger p = sc.nextBigInteger();
+        System.out.print("Enter base (g): ");
+        BigInteger g = sc.nextBigInteger();
+        System.out.print("Enter Alice's private key: ");
+        BigInteger a = sc.nextBigInteger();
+        System.out.print("Enter Bob's private key: ");
+        BigInteger b = sc.nextBigInteger();
+        sc.close();
+
+        // Compute public keys
+        BigInteger A = g.modPow(a, p);
+        BigInteger B = g.modPow(b, p);
+
+        // Compute shared secret key
+        BigInteger sharedKey = B.modPow(a, p); // Same as A.modPow(b, p)
+
+        System.out.println("Alice's Public Key: " + A);
+        System.out.println("Bob's Public Key: " + B);
+        System.out.println("Shared Secret Key: " + sharedKey);
+    }
+}
+
+---------------------------------
+row col
+import java.util.Scanner;
+
+class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the plain text:");
+        String text = scanner.nextLine();
+        System.out.println("Enter the rows:");
+        int rows = scanner.nextInt();
+        System.out.println("Enter the columns:");
+        int cols = scanner.nextInt();
+
+        char[][] matrix = new char[rows][cols];
+        int index = 0;
+        for (int i = 0; i < rows; i++)
+            for (int j = 0; j < cols; j++)
+                matrix[i][j] = index < text.length() ? text.charAt(index++) : 'X';
+        
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < rows; i++)
+            for (int j = cols - 1; j >= 0; j--)
+                result.append(matrix[i][j]);
+        
+        System.out.println(result.toString());
+    }
+}
+--------------------------------------------------------
+des 
+
+import javax.crypto.*;
+import java.util.*;
+
+class Main {
+    public static void main(String[] a) throws Exception {
+        Scanner s = new Scanner(System.in);
+        System.out.print("Message: ");
+        String msg = s.nextLine();
+        s.close();
+
+        SecretKey key = KeyGenerator.getInstance("DES").generateKey();
+        Cipher c = Cipher.getInstance("DES");
+
+        c.init(Cipher.ENCRYPT_MODE, key);
+        String enc = Base64.getEncoder().encodeToString(c.doFinal(msg.getBytes()));
+        System.out.println("Encrypted: " + enc);
+
+        c.init(Cipher.DECRYPT_MODE, key);
+        System.out.println("Decrypted: " + new String(c.doFinal(Base64.getDecoder().decode(enc))));
+    }
+}
+-----------------------------------------------------
+caeser
+
+import java.util.Scanner;
+class Main {
+    public static void main(String[] a) {
+        Scanner s = new Scanner(System.in);
+        System.out.println("Enter text:");
+        String t = s.nextLine().toUpperCase();
+        System.out.println("Enter shift:");
+        int k = s.nextInt() % 26;       
+        // Encryption
+        System.out.print("Encrypted: ");
+        for (char c : t.toCharArray()) 
+            System.out.print(Character.isLetter(c) ? (char) ('A' + (c - 'A' + k) % 26) : c);
+        System.out.println();
+        // Decryption
+        System.out.print("Decrypted: ");
+        for (char c : t.toCharArray()) 
+            System.out.print(Character.isLetter(c) ? (char) ('A' + (c - 'A' - k + 26) % 26) : c);
+        s.close();
+    }
+}
+
